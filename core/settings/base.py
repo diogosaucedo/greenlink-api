@@ -11,16 +11,20 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-uri^+3q4t8a67=h-pssmf^9$dwwxij4mrq3)jiwcl57et^%_dw"
+SECRET_KEY = os.environ.setdefault("SECRET_KEY", "AbcDef")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -116,9 +120,36 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "staticfiles/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# python manage.py test
+TESTING = False
+
+# DictConfig schema: https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console": {"format": "%(name)-12s %(levelname)-8s %(message)s"},
+        "file": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "console"},
+        "file": {
+            "class": "logging.FileHandler",
+            "formatter": "file",
+            "filename": "app.log",
+        },
+    },
+    "loggers": {
+        "": {
+            "level": os.environ.get("DJANGO_LOG_LEVEL", "WARN"),
+            "handlers": ["console", "file"],
+        }
+    },
+}
